@@ -20,19 +20,29 @@ function Post(){
   const [title]=useState("DYnamic Comment List");
   const updateTheSingleComm=(e)=>setSingleComment(e.target.value);
   const [singlecomment, setSingleComment]=useState([]);
-  const [comment, setComment]=useState([]);
+
+  //Immutable Object
+  const[post,setPost]=useState({
+    message:"I am Facebook post",
+    likecount:0,
+    dislikecount:0,
+    comment:[],
+  })
+
+  
    const addComment=()=>{
      // setComment(["Hello Universe",...comment]);
-      setComment([singlecomment,...comment]);
+     setPost({...post,comment:[singlecomment,...post.comment]});
       setSingleComment("");
    };
   return(
     <div>
     <h1>{title}</h1>
+    <h3>{post.message}</h3>
     <input type="text" name=""  onChange={updateTheSingleComm} value={singlecomment} placeholder="Comment.."/>
     <button onClick={addComment}>Add Comment</button>
-    <div>Comments {comment.length}</div>
-    {comment.map((item,index)=>(
+    <div>Comments {post.comment.length}</div>
+    {post.map((item,index)=>(
       <div key={index}>{item}</div>
     ))}
     </div>
