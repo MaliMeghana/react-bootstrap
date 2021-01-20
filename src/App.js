@@ -22,6 +22,11 @@ function Post(){
      At the same time we are updating , 
      the state of react state var, to keep value SYN
   */
+ /**
+  * Validation 
+  * 
+  * its require backend ajax call
+  */
   const updateUsername=(e)=>setUsername(e.target.value);
   const updatePassword=(e)=>setPassword(e.target.value);
   return(
