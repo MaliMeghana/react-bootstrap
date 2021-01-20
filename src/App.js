@@ -5,19 +5,28 @@ import { useState } from "react";
 function App() {
   let count=100;
   let [counter, setCounter]=useState(200);
-  const handleClick=()=>{
-    setCounter(counter+1);
-     count +=1;
-  }
+  const[title,setTitle]=useState("My Project");
+  const[isActive,setActive]=useState(true);
+  const[list, setList]=useState(["Hello World"]); //list is immutable
+  // const likeMethod=()=>{
+  //   setCounter(counter+1); 
+  // }
+  // const dislikeMethod=()=>{
+  //   setCounter(counter-1); 
+  // }
+  const addElement=()=>{
+    console.log("call is here");
+        setList(["Hello Universe",...list]);
+  };
   return( 
    <div>
-      <div>Hello World</div>
-      <div>
-        {counter}/{count}
-      </div>
-      <div>
-        <button onClick={handleClick}>Click Me</button>
-      </div>
+      <div>{title}</div>
+      <div>Array List</div>
+      <button  onClick={addElement}>Add Element</button> 
+      <div>{list.length}</div>
+     {list.map((item, index)=>{
+       <div key={index}><h4></h4></div>
+     })}  
     </div>
   );
 }
