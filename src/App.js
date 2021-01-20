@@ -13,34 +13,29 @@ function App() {
 --All form elements have its own states
 --And React Also have states.
 <input></input>
+
+Adding Comments Dyanamically
 */
 function Post(){
-  const [title]=useState("Working with Form Input Element");
-  const[username, setUsername]=useState("");
-  const[password, setPassword]=useState("");
-  /*When the state of Input Elelemt is updates . 
-     At the same time we are updating , 
-     the state of react state var, to keep value SYN
-  */
- /**
-  * Validation 
-  * 
-  * its require backend ajax call
-  */
-  const updateUsername=(e)=>setUsername(e.target.value);
-  const updatePassword=(e)=>setPassword(e.target.value);
+  const [title]=useState("DYnamic Comment List");
+  const updateTheSingleComm=(e)=>setSingleComment(e.target.value);
+  const [singlecomment, setSingleComment]=useState([]);
+  const [comment, setComment]=useState([]);
+   const addComment=()=>{
+     // setComment(["Hello Universe",...comment]);
+      setComment([singlecomment,...comment]);
+      setSingleComment("");
+   };
   return(
-      <div className="col-md-9 offset-md-3" >
-        <h1>{title}</h1>
-        <input type="text" name="username" onChange={updateUsername} value={username} placeholder="Username ..."/>
-        <br/>
-        <br/>
-        <input type="password" name="password" onChange={updatePassword} value={password} placeholder="Password ..."/>
-        <br/>
-        <br/>
-        <div>Username :: {username}</div>
-
-      </div>
+    <div>
+    <h1>{title}</h1>
+    <input type="text" name=""  onChange={updateTheSingleComm} value={singlecomment} placeholder="Comment.."/>
+    <button onClick={addComment}>Add Comment</button>
+    <div>Comments {comment.length}</div>
+    {comment.map((item,index)=>(
+      <div key={index}>{item}</div>
+    ))}
+    </div>
   );
 }
 export default App;
@@ -62,4 +57,8 @@ export default App;
 
 /*
 *States 
+*/
+
+/*
+LifeCYcle
 */
