@@ -90,8 +90,7 @@ function Signup() {
   });
 
   const syncName = (e) => setUser({ ...user, name: e.target.value });
-  const syncPassword = (e) =>
-    setUser({ ...user, password: e.target.value });
+  const syncPassword = (e) =>    setUser({ ...user, password: e.target.value });
   const syncEmail = (e) => setUser({ ...user, email: e.target.value });
   const syncMobile = (e) => setUser({ ...user, mobile: e.target.value });
 
