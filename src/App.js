@@ -1,152 +1,184 @@
 
-  
 import "./App.css";
 import { useState, useEffect } from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  Link,
-  useLocation,
-  useHistory,
-} from "react-router-dom";
 
 function App() {
-  const location = useLocation();
-  console.log(location);
-
-  return (
-    <>
-      {!["/login", "/signup"].includes(location.pathname) && (
-        <>
-          <Link to="/">Page1 </Link>
-          <Link to="/page2">Page2 </Link>
-          <Link to="/page3">Page3 </Link>
-        </>
-      )}
-
-      <Route path="/login" component={Login} />
-      <Route path="/signup" component={Signup} />
-
-      <Route exact path="/" component={Page1} />
-      <Route path="/page1" component={Page1} />
-      <Route path="/page2" component={Page2} />
-      <Route path="/page3" component={Page3} />
-    </>
-  );
+  return <Todo />;
 }
 
-function Page1() {
-  return <div>Page1</div>;
-}
+function Todo() {
+  const [inputTask, setInputTask] = useState("");
+  const [taskList, setTaskList] = useState([]);
 
-function Page2() {
-  const history = useHistory();
+ //fetch from DB
+  useEffect(() => {
+      const fetchData=async ()=>{
+      const url="http://localhost:4000/read";
+      const res=await fetch(url);
+      const list=await res.json();
+      setTaskList(list);
+    }
+    fetchData();
+   
+  }, []);
 
-  const signOut = () => {
-    history.push("/login");
+  // When Ever taskList is updated.
+  // Add Item
+  // Update Item
+  // Delete Item
+  // useEffect(() => {
+  //   const strTask = JSON.stringify(taskList);
+  //   localStorage.setItem("taskList", strTask);
+  // }, [taskList]);
+
+  const processInputTask = (e) => setInputTask(e.target.value);
+  const processTask = (item) => {
+    console.log("Process Task", item);
+
+    item.complete = !item.complete;
+
+    setTaskList([...taskList]);
   };
 
-  return (
-    <div>
-      Page2
-      <div>
-        <button onClick={signOut}>Sign Out</button>
-      </div>
-    </div>
-  );
-}
-
-function Page3() {
-  return <div>Page3</div>;
-}
-
-function Login() {
-  const history = useHistory();
-
-  const processLogin = () => {
-    history.push("/");
+  const checkEnterKey = (e) => {
+    console.log(e.keyCode);
+    if (e.keyCode === 13) {
+      addNewTask();
+    }
   };
 
-  const gotoRegister = () => {
-    history.push("/signup");
-  };
-
-  return (
-    <div>
-      <div>Login Page Ui</div>
-      <button onClick={processLogin}>Login</button>
-      <button onClick={gotoRegister}>Go To Regsiter</button>
-    </div>
-  );
-}
-
-function Signup() {
-  const history = useHistory();
-  const [user, setUser] = useState({
-    name: "",
-    password: "",
-    email: "",
-    mobile: "",
-  });
-
-  const syncName = (e) => setUser({ ...user, name: e.target.value });
-  const syncPassword = (e) =>    setUser({ ...user, password: e.target.value });
-  const syncEmail = (e) => setUser({ ...user, email: e.target.value });
-  const syncMobile = (e) => setUser({ ...user, mobile: e.target.value });
-
-  const regiserUser = () => {
-    if (user.name === "" || user.password === "") {
+  const addNewTask = async () => {
+    if (inputTask === "") {
+      // alert("Task Can not be empty");
       return;
     }
 
-    console.log("user", user);
-    localStorage.setItem("app-user", JSON.stringify(user));
+    // lets push hard coded new task
+    const anewTask = {
+     // id: taskList.length + 1,
+      task: inputTask,
+      complete: false,
+    };
+    const url=`http://localhost:4000/insert`;
+    await fetch(url,{
+      method:"POST",
+      header:{
+        "Content-Type":"application/json",
+      },
+      body:JSON.stringify(anewTask), //add to db
+    });
+
+    setTaskList([anewTask, ...taskList]);
+    setInputTask("");
   };
 
-  const backtoLogin = () => {
-    history.push("/login");
+  const deleteTask = (item) => {
+    console.log("Calling Delete", item);
+
+    // Filter the Click Item
+    const newTaskList = taskList.filter((aitem) => {
+      if (aitem.id === item.id) {
+        // ignore this item
+        return false;
+      } else {
+        return true;
+      }
+    });
+
+    setTaskList(newTaskList);
   };
 
   return (
     <div>
-      <h3>Sign Up Form</h3>
+      <h3>Todo Application</h3>
 
+      {/** Input Block */}
       <div>
-        Name{" "}
         <input
           type="text"
-          value={user.name}
-          onChange={syncName}
-          required
+          value={inputTask}
+          onChange={processInputTask}
+          onKeyUp={checkEnterKey}
+          placeholder="Add your task here"
         />
+        <button onClick={addNewTask}>Add Task</button>
       </div>
 
-      <div>
-        Pswd{" "}
-        <input
-          type="password"
-          value={user.password}
-          onChange={syncPassword}
-          required
-        />
-      </div>
+      {/** New/Incomplete Task List */}
+      <h5>
+        InComplete Task {taskList.filter((item) => !item.complete).length}{" "}
+      </h5>
 
-      <div>
-        Email <input type="text" value={user.email} onChange={syncEmail} />
-      </div>
+      {/** Conditional JSX */}
+      {taskList.filter((item) => !item.complete).length === 0 && (
+        <h6 className="text-info">
+          Add your First Task; And Go to the KBC
+        </h6>
+      )}
 
-      <div>
-        Mobile{" "}
-        <input type="text" value={user.mobile} onChange={syncMobile} />
-      </div>
+      {taskList
+        .filter((item) => !item.complete)
+        .map((item, index) => (
+          <div key={index}>
+            <input
+              type="checkbox"
+              checked={item.complete}
+              // onChange={processTask}
+              onChange={() => processTask(item)}
+            />
+            <span
+              onClick={() => processTask(item)}
+              style={{ marginLeft: "4px", cursor: "pointer" }}
+            >
+              {item.task}
+            </span>
+            <button
+              // onClick={deleteTask}
+              onClick={() => deleteTask(item)}
+              style={{ marginLeft: "16px" }}
+            >
+              DEL
+            </button>
+          </div>
+        ))}
 
-      <div>
-        <button onClick={regiserUser}>Register</button>
-      </div>
+      {/**Complete Task */}
+      <br />
+      <h5>
+        Completed Task {taskList.filter((item) => item.complete).length}{" "}
+      </h5>
 
-      <div>
-        <button onClick={backtoLogin}>Back to Login</button>
-      </div>
+      {/** COnditioanl JSX */}
+      {taskList.filter((item) => item.complete).length === 0 && (
+        <h6 className="text-warning">
+          Hurray, There is No Task; Time for Holiday
+        </h6>
+      )}
+
+      {taskList
+        .filter((item) => item.complete)
+        .map((item, index) => (
+          <div key={index}>
+            <input
+              type="checkbox"
+              checked={item.complete}
+              // onChange={processTask}
+              onChange={(e) => processTask(item)}
+            />
+            <span
+              onClick={() => processTask(item)}
+              style={{ marginLeft: "4px", cursor: "pointer" }}
+            >
+              {item.task}
+            </span>
+            <button
+              onClick={(e) => deleteTask(item)}
+              style={{ marginLeft: "16px" }}
+            >
+              DEL
+            </button>
+          </div>
+        ))}
     </div>
   );
 }
